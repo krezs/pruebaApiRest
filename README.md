@@ -1,3 +1,3 @@
 # pruebaApiRest
 
-ApiRest de "clientes(CRUD)" realizada con Spring
+ApiRest de "clientes(CRUD BASICO)" realizada con Spring
