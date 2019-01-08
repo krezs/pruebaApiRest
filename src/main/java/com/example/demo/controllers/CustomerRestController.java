@@ -2,10 +2,13 @@ package com.example.demo.controllers;
 
 import com.example.demo.models.entity.Customer;
 import com.example.demo.models.service.CustomerService;
+import com.example.demo.util.JsonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -15,38 +18,44 @@ public class CustomerRestController {
     @Autowired
     private CustomerService customerService;
 
-    @GetMapping("/customers")
-    public List<Customer> getCustomers(){
-        return customerService.getCustomers();
+    @RequestMapping(value="/customers", method = RequestMethod.GET)
+    public ResponseEntity<JsonResponse> getCustomers(){
+        //return customerService.getCustomers();
+        JsonResponse jsonResponse = new JsonResponse();
+        jsonResponse.setData(customerService.getCustomers());
+        return new ResponseEntity<>(jsonResponse,HttpStatus.OK);
     }
 
-    @GetMapping("/customers/{id}")
-    public Customer getCustomer(@PathVariable int id){
-        Customer customer = customerService.getCustomer(id);
-        return customer;
+    @RequestMapping(value="/customers/{id}" , method = RequestMethod.GET)
+    public ResponseEntity<JsonResponse> getCustomer(@PathVariable int id){
+        List<Customer> customers = new ArrayList<Customer>();
+        customers.add(customerService.getCustomer(id));
+        JsonResponse jsonResponse = new JsonResponse();
+        jsonResponse.setData(customers);
+        return new ResponseEntity<>(jsonResponse,HttpStatus.OK);
     }
 
-    @PostMapping("/customers")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Customer addCustomer(@RequestBody Customer customer){
-        customer.setId(null);
+    @RequestMapping(value="/customers", method =RequestMethod.POST)
+    public ResponseEntity<JsonResponse> addCustomer(@RequestBody Customer customer){
+
+        JsonResponse jsonResponse = new JsonResponse();
+        List<Customer> customers=new ArrayList<>();
+
+        String msg= customer.getId()!=null ? "Customer Updated." : "Customer Created.";
+
         customerService.saveCustomer(customer);
-        return customer;
-
+        customers.add(customer);
+        jsonResponse.setData(customers);
+        jsonResponse.setMsg(msg);
+        return new ResponseEntity<>(jsonResponse,HttpStatus.OK);
     }
 
-    @PutMapping("/customers")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Customer updateCustomer(@RequestBody Customer customer){
-        customerService.saveCustomer(customer);
-        return customer;
-
-    }
-
-    @DeleteMapping("/customers/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCustomer(@PathVariable int id){
+    @RequestMapping(value="/customers/{id}", method =RequestMethod.POST)
+    public ResponseEntity<JsonResponse> deleteCustomer(@PathVariable int id){
         customerService.deleteCustomer(id);
+        JsonResponse jsonResponse = new JsonResponse();
+        jsonResponse.setMsg("Customer Deleted.");
+        return new ResponseEntity<>(jsonResponse,HttpStatus.OK);
     }
 
 
